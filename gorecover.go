@@ -21,10 +21,13 @@ const (
 	internal_error_body = "Internal error"
 )
 
-var templateString = `
+var (
+	templateString = `
 	<html><body>
        	<h1>{{.Body}}</h1>
        	</body></html>`
+	Enabled = true
+)
 
 var defaultTemplate = template.Must(template.New("default").Parse(templateString))
 
@@ -70,6 +73,10 @@ func ErrorRecover(pages *Pages) Middleware {
 
 	return func(env Env, app App) (status Status, headers Headers, body Body) {
 		defer func() {
+			if !Enabled {
+				return
+			}
+
 			if err := recover(); err != nil {
 
 				fmt.Fprintf(os.Stderr, "-------> recover: %v\n", err)
